@@ -36,8 +36,8 @@ void order_match(Order* incoming_order, OpposingType& opposing_side, PriceCompar
 
         if (!condition(incoming_order->price, tracker->first)) break; //Breaks if lambda condition isnt met
 
-        while (price_level.head() && incoming_order->quantity > 0) { //Loop that executes trades
-            Order* resting_order = price_level.head();
+        while (price_level.head && incoming_order->quantity > 0) { //Loop that executes trades
+            Order* resting_order = price_level.head;
             uint32_t traded_quantity = std::min(incoming_order->quantity, resting_order->quantity);
             incoming_order->quantity -= traded_quantity;
             resting_order->quantity -= traded_quantity;
@@ -50,7 +50,7 @@ void order_match(Order* incoming_order, OpposingType& opposing_side, PriceCompar
                 memory_pool.de_allocate(resting_order);
             }
         }
-        if (!price_level.head()) { //Once all orders have been filled at certain price level, its erased
+        if (!price_level.head) { //Once all orders have been filled at certain price level, its erased
             tracker = opposing_side.erase(tracker);
         }
         else {
