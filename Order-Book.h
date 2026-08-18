@@ -26,6 +26,38 @@ public:
     OrderBook(uint32_t order_capacity);
     //Function to add orders to memory pool
     void add_order(const Order& incoming_order);
+private:
+//Function template for order matching function
+template <typename OpposingType, typename PriceComparison>
+void order_match(Order* incoming_order, OpposingType& opposing_side, PriceComparison condition) {
+    auto tracker = opposing_side.begin(); //Tracker to act as holder of what price order is compared against
+    while (tracker != opposing_side.end() && incoming_order->quantity > 0) {
+        PriceLevel& price_level = tracker->second;
+
+        if (!condition(incoming_order->price, tracker->first)) break; //Breaks if lambda condition isnt met
+
+        while (price_level.head() && incoming_order->quantity > 0) { //Loop that executes trades
+            Order* resting_order = price_level.head();
+            uint32_t traded_quantity = std::min(incoming_order->quantity, resting_order->quantity);
+            incoming_order->quantity -= traded_quantity;
+            resting_order->quantity -= traded_quantity;
+
+            //Recording of trade for analytics goes here (price, quantity, ID)
+
+            if (resting_order->quantity == 0) { //Erasing resting orders once their quantity has been depleted
+                order_lookup.erase(resting_order->order_id);
+                pop_from_level(price_level);
+                memory_pool.de_allocate(resting_order);
+            }
+        }
+        if (!price_level.head()) { //Once all orders have been filled at certain price level, its erased
+            tracker = opposing_side.erase(tracker);
+        }
+        else {
+            ++tracker;
+        }
+    }
+}
 };
 
 #endif
