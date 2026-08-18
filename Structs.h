@@ -17,4 +17,9 @@ struct Order {
     Order* prev = nullptr;
 };
 
+//Struct for holding orders at each price level
+struct PriceLevel {
+    Order* head = nullptr;
+    Order* tail = nullptr;
+};
 //Placeholder for data analytics snapshot struct
