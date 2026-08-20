@@ -23,11 +23,15 @@ private:
     std::bernoulli_distribution type_dist;
     //Order ID tracker
     uint64_t order_id_tracker;
+    //Holder for price reference
+    double ref;
 public:
     //Constructor, order rate per sec
-    Generator(double order_rate, uint32_t num_clients, uint32_t min_quantity, uint32_t max_quantity, uint32_t reference_price, uint32_t price_stddev);
+    Generator(double order_rate, uint32_t num_clients, uint32_t min_quantity, uint32_t max_quantity, double reference_price, double mean_price_offset);
     //Function to generate orders
     Order generate_order();
+    //Function to hold order wait time generation
+    double wait_time();
 };
 
 #endif
