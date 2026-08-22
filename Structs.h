@@ -23,3 +23,21 @@ struct PriceLevel {
     Order* tail = nullptr;
 };
 //Placeholder for data analytics snapshot struct
+//Stuct for holding price level volumes
+struct PriceVolume {
+    uint32_t price;
+    uint32_t volume;
+};
+//Data snapshot struct
+struct Snapshot {
+    //From orderbook
+    std::vector<PriceVolume> bid_levels;
+    std::vector<PriceVolume> ask_levels;
+    Order recent_orders[20];  // for the latest-orders table, as discussed
+
+    //From metrics
+    uint64_t throughput;
+    uint64_t total_volume;
+    double latency_p50;
+    double latency_p99;
+};
