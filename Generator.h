@@ -18,7 +18,7 @@ private:
     //Quantity distribution
     std::uniform_int_distribution<uint32_t> quantity_dist;
     //Price offset distribution (exponential to be clustered around reference price)
-    std::exponential_distribution<uint32_t> price_offset_dist;
+    std::normal_distribution<double> price_offset_dist;
     //Bid or ask  distrivution
     std::bernoulli_distribution type_dist;
     //Order ID tracker
@@ -27,7 +27,7 @@ private:
     double ref;
 public:
     //Constructor, order rate per sec
-    Generator(double order_rate, uint32_t num_clients, uint32_t min_quantity, uint32_t max_quantity, double reference_price, double mean_price_offset);
+    Generator(double order_rate, uint32_t num_clients, uint32_t min_quantity, uint32_t max_quantity, double reference_price, double price_stddev);
     //Function to generate orders
     Order generate_order();
     //Function to hold order wait time generation

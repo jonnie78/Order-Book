@@ -24,7 +24,7 @@ Order Generator::generate_order() {
             ).count()),
         .client_id = client_dist(rng),
         .quantity = quantity_dist(rng),
-        .price = static_cast<uint32_t>(type ? ref - price_offset_dist(rng) : ref + price_offset_dist(rng)),
+        .price = static_cast<uint32_t>(max(0.0, ref + price_offset_dist(rng))),
         .is_buy = type
     };
 }
