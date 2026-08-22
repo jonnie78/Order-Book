@@ -33,7 +33,7 @@ struct Snapshot {
     //From orderbook
     std::vector<PriceVolume> bid_levels;
     std::vector<PriceVolume> ask_levels;
-    Order recent_orders[20];  // for the latest-orders table, as discussed
+    Order recent_orders[20];
 
     //From metrics
     uint64_t throughput;
