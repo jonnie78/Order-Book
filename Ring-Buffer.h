@@ -49,4 +49,12 @@ public:
         head.store(next_head, std::memory_order_release);
         return true;
     }
+    //Copy constructor
+    SPSC(const SPSC&) = delete;
+    //Copy assignment
+    SPSC& operator=(const SPSC&) = delete;
+    //Move constructor
+    SPSC(SPSC&&) = delete;
+    //Move assignment
+    SPSC& operator=(SPSC&&) = delete;
 };
