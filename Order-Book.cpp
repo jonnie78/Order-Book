@@ -1,4 +1,5 @@
 #include"Order-Book.h"
+#include<iostream>
 
 using namespace std;
 
@@ -58,4 +59,52 @@ void OrderBook::add_order(const Order& incoming_order) {
     else {
         memory_pool.de_allocate(new_order);
     }
+}
+//Function to create depth charts for snapshot
+void OrderBook::depth_levels(vector<PriceVolume> bid_depth, vector<PriceVolume> ask_depth) {
+    bid_depth.clear();
+    for (const auto& [price, level] : bids) {
+        uint32_t total = 0;
+        Order* o = level.head;
+        while(o) {
+            total += o->quantity;
+            o = o->next;
+        }
+        bid_depth.push_back({price, total});
+    }
+
+    ask_depth.clear();
+    for (const auto& [price, level] : asks) {
+        uint32_t total = 0;
+        Order* o = level.head;
+        while(o) {
+            total += o->quantity;
+            o = o->next;
+        }
+        ask_depth.push_back({price, total});
+    }
+}
+//Print function for testing
+void OrderBook::print_book() const {
+    std::cout << "----- ASKS (low to high) -----\n";
+    for (auto it = asks.rbegin(); it != asks.rend(); ++it) {
+        std::cout << "Price: " << it->first << " | ";
+        Order* o = it->second.head;
+        while (o) {
+            std::cout << "[id:" << o->order_id << " qty:" << o->quantity << "] ";
+            o = o->next;
+        }
+        std::cout << "\n";
+    }
+    std::cout << "----- BIDS (high to low) -----\n";
+    for (auto it = bids.begin(); it != bids.end(); ++it) {
+        std::cout << "Price: " << it->first << " | ";
+        Order* o = it->second.head;
+        while (o) {
+            std::cout << "[id:" << o->order_id << " qty:" << o->quantity << "] ";
+            o = o->next;
+        }
+        std::cout << "\n";
+    }
+    std::cout<<endl;
 }
