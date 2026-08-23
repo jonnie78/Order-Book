@@ -23,7 +23,7 @@ public:
     //Called from OrderBook's matching loop when a trade executes
     void record_trade(uint32_t quantity, uint64_t latency_ns);
     //Called when building a snapshot to get throughput
-    double get_throughput() const;
+    double get_throughput();
     //Called when building a snapshot to get total trading volume
     uint64_t get_total_volume() const;
     //Called when building a snapshot to get latency at the 50th percentile
