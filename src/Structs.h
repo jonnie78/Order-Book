@@ -34,6 +34,7 @@ struct Snapshot {
     std::vector<PriceVolume> bid_levels;
     std::vector<PriceVolume> ask_levels;
     Order recent_orders[20];
+    int recent_count = 0;
 
     //From metrics
     uint64_t throughput;
