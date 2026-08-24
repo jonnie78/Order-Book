@@ -11,6 +11,7 @@ class Metrics {
 private:
     std::atomic<uint64_t> orders_processed;
     std::atomic<uint64_t> total_volume;
+    double smoothed_throughput = 0.0;
     //Latency tracking
     std::chrono::steady_clock::time_point last_reset;
     std::array<uint64_t, 4096> latency_samples;

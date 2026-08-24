@@ -1,5 +1,6 @@
 #include <algorithm>
 #include"Metrics.h"
+#include<iostream>
 
 using namespace std;
 
@@ -25,7 +26,10 @@ double Metrics::get_throughput() {
    double elapsed_sec = chrono::duration<double>(now - last_reset).count();
    uint64_t count = orders_processed.exchange(0);  //Reads and reset atomically
    last_reset = now;
-   return elapsed_sec > 0 ? count / elapsed_sec : 0.0;
+   double instant = elapsed_sec > 0 ? count / elapsed_sec : 0.0;
+   const double alpha = 0.1; //Smoothing factor, lower = smoother/slower to react
+   smoothed_throughput = alpha * instant + (1.0 - alpha) * smoothed_throughput;
+   return smoothed_throughput;
 }
 //Returning total traded volume
  uint64_t Metrics::get_total_volume() const {

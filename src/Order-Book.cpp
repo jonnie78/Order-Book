@@ -1,5 +1,6 @@
 #include"Order-Book.h"
 #include<iostream>
+#include <chrono>
 
 using namespace std;
 
@@ -33,6 +34,7 @@ void OrderBook::add_order(const Order& incoming_order) {
     new_order->is_buy = incoming_order.is_buy;
     new_order->timestamp = incoming_order.timestamp;
     new_order->next = new_order->prev = nullptr;
+    metrics.record_order_received();
 
     //Matching to opposing side
     if (new_order->is_buy) {
@@ -61,8 +63,9 @@ void OrderBook::add_order(const Order& incoming_order) {
     }
 }
 //Function to create depth charts for snapshot
-void OrderBook::depth_levels(vector<PriceVolume> bid_depth, vector<PriceVolume> ask_depth) {
+void OrderBook::depth_levels(vector<PriceVolume>& bid_depth, vector<PriceVolume>& ask_depth) {
     bid_depth.clear();
+    uint32_t cumulative = 0;
     for (const auto& [price, level] : bids) {
         uint32_t total = 0;
         Order* o = level.head;
@@ -70,10 +73,12 @@ void OrderBook::depth_levels(vector<PriceVolume> bid_depth, vector<PriceVolume> 
             total += o->quantity;
             o = o->next;
         }
-        bid_depth.push_back({price, total});
+        cumulative += total;
+        bid_depth.push_back({price, cumulative});
     }
 
     ask_depth.clear();
+    cumulative = 0;
     for (const auto& [price, level] : asks) {
         uint32_t total = 0;
         Order* o = level.head;
@@ -81,26 +86,36 @@ void OrderBook::depth_levels(vector<PriceVolume> bid_depth, vector<PriceVolume> 
             total += o->quantity;
             o = o->next;
         }
-        ask_depth.push_back({price, total});
+        cumulative += total;
+        ask_depth.push_back({price, cumulative});
     }
 }
 //Function to extract 20 recent orders
 void OrderBook::get_recent_orders(Order out[20], int& out_count) const {
     out_count = 0;
-    for (auto& [price, level] : bids) {
-        Order* o = level.head;
-        while (o && out_count < 20) {
-            out[out_count++] = *o;
-            o = o->next;
+    auto bid_it = bids.begin();
+    auto ask_it = asks.begin();
+
+    while (out_count < 20 && (bid_it != bids.end() || ask_it != asks.end())) {
+        if (bid_it != bids.end()) {
+            Order* o = bid_it->second.head;
+            while (o && out_count < 20) { out[out_count++] = *o; o = o->next; }
+            ++bid_it;
+        }
+        if (ask_it != asks.end() && out_count < 20) {
+            Order* o = ask_it->second.head;
+            while (o && out_count < 20) { out[out_count++] = *o; o = o->next; }
+            ++ask_it;
         }
     }
-    for (auto& [price, level] : asks) {
-        Order* o = level.head;
-        while (o && out_count < 20) {
-            out[out_count++] = *o;
-            o = o->next;
-        }
-    }
+}
+//Get time helper function 
+uint64_t OrderBook::now_ns() {
+    return static_cast<uint64_t>(
+        chrono::duration_cast<chrono::nanoseconds>(
+            chrono::steady_clock::now().time_since_epoch()
+        ).count()
+    );
 }
 //Print function for testing
 void OrderBook::print_book() const {

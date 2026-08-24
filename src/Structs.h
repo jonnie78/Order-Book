@@ -1,6 +1,7 @@
 #pragma once
 
 #include<cstdint>
+#include<vector>
 
 //Struct to carry order data
 struct Order {
@@ -37,7 +38,7 @@ struct Snapshot {
     int recent_count = 0;
 
     //From metrics
-    uint64_t throughput;
+    double throughput;
     uint64_t total_volume;
     double latency_p50;
     double latency_p99;

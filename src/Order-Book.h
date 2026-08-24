@@ -6,6 +6,7 @@
 #include<functional>
 #include"Structs.h"      
 #include"Memory-Pool.h"
+#include"Metrics.h"
 
 class OrderBook {
 private:
@@ -17,6 +18,8 @@ private:
     std::map<uint32_t, PriceLevel, std::greater<uint32_t>> bids;
     //Unorderd map for order lookup by ID
     std::unordered_map<uint64_t, Order*> order_lookup;
+    //Metrics
+    Metrics metrics;
     //Add order to its price levels linked list
     void add_to_level(PriceLevel& price_level, Order* order);
     //Remove order from its price levels linked list
@@ -27,9 +30,13 @@ public:
     //Function to add orders to memory pool
     void add_order(const Order& incoming_order);
     //Function to gather price level depth
-    void depth_levels(std::vector<PriceVolume> bid_depth, std::vector<PriceVolume> ask_depth);
+    void depth_levels(std::vector<PriceVolume>& bid_depth, std::vector<PriceVolume>& ask_depth);
     //Function to extract 20 recent orders
-    void OrderBook::get_recent_orders(Order out[20], int& out_count) const;
+    void get_recent_orders(Order out[20], int& out_count) const;
+    //Getter for metrics
+    Metrics& get_metrics() { return metrics; }
+    //Helper function to get time
+    static uint64_t now_ns();
     void print_book() const;
 private:
 //Function template for order matching function
@@ -47,7 +54,7 @@ void order_match(Order* incoming_order, OpposingType& opposing_side, PriceCompar
             incoming_order->quantity -= traded_quantity;
             resting_order->quantity -= traded_quantity;
 
-            //Recording of trade for analytics goes here (price, quantity, ID)
+            metrics.record_trade(traded_quantity, now_ns() - incoming_order->timestamp);
 
             if (resting_order->quantity == 0) { //Erasing resting orders once their quantity has been depleted
                 order_lookup.erase(resting_order->order_id);
