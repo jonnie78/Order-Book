@@ -26,7 +26,10 @@ public:
     OrderBook(uint32_t order_capacity);
     //Function to add orders to memory pool
     void add_order(const Order& incoming_order);
+    //Function to gather price level depth
     void depth_levels(std::vector<PriceVolume> bid_depth, std::vector<PriceVolume> ask_depth);
+    //Function to extract 20 recent orders
+    void OrderBook::get_recent_orders(Order out[20], int& out_count) const;
     void print_book() const;
 private:
 //Function template for order matching function

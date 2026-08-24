@@ -84,6 +84,24 @@ void OrderBook::depth_levels(vector<PriceVolume> bid_depth, vector<PriceVolume> 
         ask_depth.push_back({price, total});
     }
 }
+//Function to extract 20 recent orders
+void OrderBook::get_recent_orders(Order out[20], int& out_count) const {
+    out_count = 0;
+    for (auto& [price, level] : bids) {
+        Order* o = level.head;
+        while (o && out_count < 20) {
+            out[out_count++] = *o;
+            o = o->next;
+        }
+    }
+    for (auto& [price, level] : asks) {
+        Order* o = level.head;
+        while (o && out_count < 20) {
+            out[out_count++] = *o;
+            o = o->next;
+        }
+    }
+}
 //Print function for testing
 void OrderBook::print_book() const {
     std::cout << "----- ASKS (low to high) -----\n";
