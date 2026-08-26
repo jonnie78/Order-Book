@@ -37,7 +37,6 @@ public:
     Metrics& get_metrics() { return metrics; }
     //Helper function to get time
     static uint64_t now_ns();
-    void print_book() const;
 private:
 //Function template for order matching function
 template <typename OpposingType, typename PriceComparison>

@@ -90,7 +90,7 @@ void OrderBook::depth_levels(vector<PriceVolume>& bid_depth, vector<PriceVolume>
         ask_depth.push_back({price, cumulative});
     }
 }
-//Function to extract 20 recent orders
+//Function to extract 20 recent orders, implemented this way to get mx of bids and asks
 void OrderBook::get_recent_orders(Order out[20], int& out_count) const {
     out_count = 0;
     auto bid_it = bids.begin();
@@ -116,28 +116,4 @@ uint64_t OrderBook::now_ns() {
             chrono::steady_clock::now().time_since_epoch()
         ).count()
     );
-}
-//Print function for testing
-void OrderBook::print_book() const {
-    std::cout << "----- ASKS (low to high) -----\n";
-    for (auto it = asks.rbegin(); it != asks.rend(); ++it) {
-        std::cout << "Price: " << it->first << " | ";
-        Order* o = it->second.head;
-        while (o) {
-            std::cout << "[id:" << o->order_id << " qty:" << o->quantity << "] ";
-            o = o->next;
-        }
-        std::cout << "\n";
-    }
-    std::cout << "----- BIDS (high to low) -----\n";
-    for (auto it = bids.begin(); it != bids.end(); ++it) {
-        std::cout << "Price: " << it->first << " | ";
-        Order* o = it->second.head;
-        while (o) {
-            std::cout << "[id:" << o->order_id << " qty:" << o->quantity << "] ";
-            o = o->next;
-        }
-        std::cout << "\n";
-    }
-    std::cout<<endl;
 }
